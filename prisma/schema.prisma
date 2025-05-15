@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model categories {
+  id       BigInt     @id
+  name     String
+  products products[]
+}
+
+model order_items {
+  id                BigInt   @id
+  quantity          Int
+  price_at_purchase Decimal  @db.Decimal(10, 2)
+  order_id          BigInt
+  product_id        BigInt
+  orders            orders   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  products          products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model orders {
+  id          BigInt        @id
+  order_date  DateTime      @default(now()) @db.Timestamp(6)
+  status      String
+  user_id     BigInt
+  order_items order_items[]
+  users       users         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model products {
+  id             BigInt        @id
+  name           String
+  description    String
+  price          Decimal       @db.Decimal(10, 2)
+  stock_quantity Int
+  category_id    BigInt
+  supplier_id    BigInt
+  order_items    order_items[]
+  categories     categories    @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  suppliers      suppliers     @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  wishlists      wishlists[]
+}
+
+model shipping_addresses {
+  id            BigInt  @id
+  address_line1 String
+  address_line2 String?
+  city          String
+  state         String
+  postal_code   String
+  country       String
+  is_default    Boolean @default(false)
+  user_id       BigInt
+  users         users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model suppliers {
+  id                      BigInt     @id
+  name                    String
+  contact_info            String
+  supplier_code           String
+  business_license_number String
+  tax_id                  String
+  payment_terms           String
+  rating                  Decimal    @db.Decimal(3, 2)
+  notes                   String?
+  products                products[]
+}
+
+model users {
+  id                 BigInt               @id
+  username           String               @unique
+  password_hash      String
+  email              String               @unique
+  role               user_role
+  created_at         DateTime             @default(now()) @db.Timestamp(6)
+  first_name         String
+  last_name          String
+  phone              String
+  orders             orders[]
+  shipping_addresses shipping_addresses[]
+  wishlists          wishlists[]
+}
+
+model wishlists {
+  id         BigInt   @id
+  added_at   DateTime @default(now()) @db.Timestamp(6)
+  user_id    BigInt
+  product_id BigInt
+  products   products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum user_role {
+  admin
+  customer
+  supplier
+}
