@@ -27,6 +27,9 @@ const formSchema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters long"),
     role: z.enum(["customer", "supplier"]),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    phone: z.string(),
 });
 
 export default function Login() {
@@ -40,13 +43,16 @@ export default function Login() {
             role: "customer",
         },
     });
+
     const onSubmit = formState.handleSubmit((data) => {
         console.log("Form submitted:");
+
+        AutoSignUp(data);
 
         supabase.auth.signUp({
             email: data.email,
             password: data.password,
-        }).then(() => AutoSignUp(data.role))
+        });
     });
 
     const onGoogleLogin = () => {
@@ -102,7 +108,57 @@ export default function Login() {
                                     </FormItem>
                                 )}
                             />
-
+                            <FormField
+                                control={formState.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>First Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="shadcn"
+                                                type="text"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={formState.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Last Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="shadcn"
+                                                type="text"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={formState.control}
+                                name="phone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Phone Number</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="shadcn"
+                                                type="text"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <FormField
                                 control={formState.control}
                                 name="role"
