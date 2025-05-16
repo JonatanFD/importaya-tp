@@ -67,12 +67,12 @@ export async function SaveUserInDatabase(data: {
 export async function GetUserByEmail(email: string) {
     try {
         const prisma = new PrismaClient();
-        const user = await prisma.users.findUnique({
+        const users = await prisma.users.findMany({
             where: {
                 email: email,
             },
         });
-        return user;
+        return users[0];
     } catch (error) {
         console.error("Error getting user by email:", error);
         return null;

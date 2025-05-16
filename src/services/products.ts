@@ -95,3 +95,24 @@ export async function CreateCategory(data: {
     }
 }       
 
+
+export async function GetProducts() {
+    try {
+        const prisma = new PrismaClient();
+        const products = await prisma.products.findMany({
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                url: true,
+                category_id: true,
+                supplier_id: true,
+            },
+        });
+        return products;
+    } catch (error) {
+        console.error("Error getting products:", error);
+        return null;
+    }
+}
