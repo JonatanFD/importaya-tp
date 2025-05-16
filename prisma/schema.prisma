@@ -41,6 +41,7 @@ model products {
   stock_quantity Int
   category_id    String
   supplier_id    String
+  url            String
   order_items    order_items[]
   categories     categories    @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   suppliers      suppliers     @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

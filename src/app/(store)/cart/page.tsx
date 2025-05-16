@@ -17,7 +17,7 @@ export default function Cart() {
     return (
         <section className="max-w-7xl w-full mx-auto py-12 px-4 border-b space-y-4">
 
-            <header>
+            <header className="flex items-center justify-between">
                 <h2 className="text-5xl font-bold">Cart</h2>
                 <Button onClick={onAddOrder}>Add Order</Button>
             </header>

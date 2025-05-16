@@ -2,12 +2,18 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import LogOut from "./LogOut";
 import ImportaYaLogo from "../icons/ImportaYaLogo";
+import { GetUserByEmail } from "@/services/auth";
 
 export default async function AppHeader() {
     const supabase = await createClient();
     const session = await supabase.auth.getSession();
 
     const username = session?.data.session?.user.user_metadata.name;
+    
+    const dbUser = await GetUserByEmail(
+        session?.data.session?.user.email as string
+    );
+    const role = dbUser?.role;
 
     return (
         <header className="px-4 h-16 border-b">
@@ -25,6 +31,11 @@ export default async function AppHeader() {
                             <li>
                                 <Link href="/home">Home</Link>
                             </li>
+                            {role === "admin" && (
+                                <li>
+                                    <Link href="/admin">Admin</Link>
+                                </li>
+                            )}
                             {session?.data.session ? (
                                 <>
                                     <li>
@@ -37,9 +48,14 @@ export default async function AppHeader() {
                                     <li>Welcome {username}</li>
                                 </>
                             ) : (
-                                <li>
-                                    <Link href="/login">Login</Link>
-                                </li>
+                                <>
+                                    <li>
+                                        <Link href="/login">Login</Link>
+                                    </li>
+                                    <li>
+                                        <Link href="/register">Register</Link>
+                                    </li>
+                                </>
                             )}
                         </ul>
                     </nav>

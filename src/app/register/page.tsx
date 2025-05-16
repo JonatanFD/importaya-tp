@@ -21,7 +21,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { AutoSignUp } from "@/services/auth";
+import { SaveUserInDatabase } from "@/services/auth";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -32,8 +33,9 @@ const formSchema = z.object({
     phone: z.string(),
 });
 
-export default function Login() {
+export default function Register() {
     const supabase = createClient();
+    const router = useRouter();
 
     const formState = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -41,18 +43,34 @@ export default function Login() {
             email: "",
             password: "",
             role: "customer",
+            firstName: "",
+            lastName: "",
+            phone: "",
         },
     });
 
-    const onSubmit = formState.handleSubmit((data) => {
+    const onSubmit = formState.handleSubmit((form) => {
         console.log("Form submitted:");
 
-        AutoSignUp(data);
+        supabase.auth
+            .signUp({
+                email: form.email,
+                password: form.password,
+            })
+            .then(({ data, error }) => {
+                console.log("Sign up response:", data, error);
 
-        supabase.auth.signUp({
-            email: data.email,
-            password: data.password,
-        });
+                if (error) {
+                    console.error("Error signing up:", error);
+                    return;
+                }
+
+                console.log("User signed up successfully:", data);
+
+                SaveUserInDatabase({ ...form, id: data.user!.id });
+
+                router.push("/login");
+            });
     });
 
     const onGoogleLogin = () => {
@@ -82,8 +100,9 @@ export default function Login() {
                                     <FormItem>
                                         <FormLabel>Email</FormLabel>
                                         <FormControl>
+                                            {" "}
                                             <Input
-                                                placeholder="shadcn"
+                                                placeholder="Your email"
                                                 type="email"
                                                 {...field}
                                             />
@@ -99,8 +118,10 @@ export default function Login() {
                                     <FormItem>
                                         <FormLabel>Password</FormLabel>
                                         <FormControl>
+                                            {" "}
                                             <Input
-                                                placeholder="shadcn"
+                                                placeholder="Your password"
+                                                type="password"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -116,7 +137,7 @@ export default function Login() {
                                         <FormLabel>First Name</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="shadcn"
+                                                placeholder="Your first name"
                                                 type="text"
                                                 {...field}
                                             />
@@ -133,7 +154,7 @@ export default function Login() {
                                         <FormLabel>Last Name</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="shadcn"
+                                                placeholder="Your last name"
                                                 type="text"
                                                 {...field}
                                             />
@@ -150,8 +171,8 @@ export default function Login() {
                                         <FormLabel>Phone Number</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="shadcn"
-                                                type="text"
+                                                placeholder="Your phone number"
+                                                type="tel"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -171,7 +192,7 @@ export default function Login() {
                                         >
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Select a verified email to display" />
+                                                    <SelectValue placeholder="Select your role" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
@@ -188,7 +209,7 @@ export default function Login() {
                                 )}
                             />
                             <Button type="submit" className="w-full">
-                                Login
+                                Register
                             </Button>
                             <Button
                                 type="button"

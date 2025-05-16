@@ -2,11 +2,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -15,19 +23,30 @@ const formSchema = z.object({
 
 export default function Login() {
     const supabase = createClient();
+    const router = useRouter();
 
-    const formState = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
             password: "",
         },
     });
-    const onSubmit = formState.handleSubmit((data) => {
-        supabase.auth.signInWithPassword({
-            email: data.email,
-            password: data.password,
-        });
+
+    const onSubmit = form.handleSubmit((data) => {
+        console.log("Form submitted:", data);
+        supabase.auth
+            .signInWithPassword({
+                email: data.email,
+                password: data.password,
+            })
+            .then((res) => {
+                console.log("Sign in response:", res);
+                router.push("/home");
+            })
+            .catch((err) => {
+                console.error("Error signing in:", err);
+            });
     });
 
     const onGoogleLogin = () => {
@@ -47,36 +66,42 @@ export default function Login() {
                     <CardTitle>Login</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Form {...formState}>
-                        <form className="space-y-4" onSubmit={onSubmit}>
-                            <div>
-                                <label
-                                    htmlFor="email"
-                                    className="block text-sm font-medium text-gray-700"
-                                >
-                                    Email
-                                </label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label
-                                    htmlFor="password"
-                                    className="block text-sm font-medium text-gray-700"
-                                >
-                                    Password
-                                </label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Enter your password"
-                                    required
-                                />
-                            </div>
+                    <Form {...form}>
+                        <form onSubmit={onSubmit} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="email"
+                                                placeholder="Enter your email"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="Enter your password"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <Button type="submit" className="w-full">
                                 Login
                             </Button>

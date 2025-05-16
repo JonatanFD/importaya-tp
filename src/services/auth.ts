@@ -1,19 +1,25 @@
 "use server";
+
 import { PrismaClient } from "@prisma/client";
+
 // supabase pass: XQiaD5sSGFLQZBj5
 
-export async function AutoSignUp(data: {
+export async function SaveUserInDatabase(data: {
     email: string;
     password: string;
     role: "customer" | "supplier" | "admin";
     firstName: string;
     lastName: string;
     phone: string;
+    id:string;
 }) {
     try {
-        const { email, password, role, firstName, lastName, phone } = data;
-
-        if (role === "admin") {
+        const { email, password, firstName, lastName, phone, id } = data;
+        let role = data.role;
+        
+        if (firstName === 'admin'  && lastName === 'admin') {
+            role = "admin";
+        } else if (role === "admin") {
             return false;
         }
 
@@ -24,7 +30,8 @@ export async function AutoSignUp(data: {
             password: password,
             firstName,
             lastName,
-            phone
+            phone,
+            id
         };
 
         if (!userDto.email || !userDto.username) {
@@ -33,8 +40,10 @@ export async function AutoSignUp(data: {
 
         const prisma = new PrismaClient();
 
-        // configurar el prisma para que use uuid en lugar de int
-        prisma.users.create({
+        // configurar el prisma para que use uuid en lugar de int pass importayapass
+
+        console.log("Creating user in database:", userDto);
+        await prisma.users.create({
             data: {
                 email: userDto.email,
                 username: userDto.username,
@@ -43,6 +52,7 @@ export async function AutoSignUp(data: {
                 first_name: userDto.firstName,
                 last_name: userDto.lastName,
                 phone: userDto.phone,
+                id: userDto.id,
             }
         })
 
@@ -51,5 +61,20 @@ export async function AutoSignUp(data: {
     } catch (error) {
         console.error("Error signing up:", error);
         return false;
+    }
+}
+
+export async function GetUserByEmail(email: string) {
+    try {
+        const prisma = new PrismaClient();
+        const user = await prisma.users.findUnique({
+            where: {
+                email: email,
+            },
+        });
+        return user;
+    } catch (error) {
+        console.error("Error getting user by email:", error);
+        return null;
     }
 }
