@@ -100,7 +100,6 @@ export default function Register() {
                                     <FormItem>
                                         <FormLabel>Email</FormLabel>
                                         <FormControl>
-                                            {" "}
                                             <Input
                                                 placeholder="Your email"
                                                 type="email"
@@ -118,7 +117,6 @@ export default function Register() {
                                     <FormItem>
                                         <FormLabel>Password</FormLabel>
                                         <FormControl>
-                                            {" "}
                                             <Input
                                                 placeholder="Your password"
                                                 type="password"
