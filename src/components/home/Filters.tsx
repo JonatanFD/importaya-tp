@@ -33,8 +33,8 @@ import { GetCategories, GetSuppliers } from "@/services/products";
 import { useHomeProducts } from "@/app/hooks/HomeProducts";
 
 const formSchema = z.object({
-    minPrice: z.number().min(0).optional(),
-    maxPrice: z.number().min(0).optional(),
+    minPrice: z.coerce.number().min(0).optional(),
+    maxPrice: z.coerce.number().min(0).optional(),
     category: z.string().optional(),
     supplierId: z.string().optional(),
 });
