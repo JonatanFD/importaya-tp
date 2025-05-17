@@ -85,7 +85,7 @@ export default function Filters() {
             </div>
 
             <Form {...formState}>
-                <form onSubmit={onSubmit} className="border-r flex-1 max-w-64">
+                <form onSubmit={onSubmit} className="border-r flex-1 md:max-w-64">
                     <Accordion type="multiple" className="overflow-visible">
                         <AccordionItem value="price">
                             <AccordionTrigger className="px-4">

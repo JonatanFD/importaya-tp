@@ -12,7 +12,7 @@ export default function Home() {
                 </p>
             </section>
 
-            <section className="max-w-7xl mx-auto flex">
+            <section className="max-w-7xl mx-auto flex flex-col md:flex-row">
                 <section className="min-w-64 flex flex-col font-mono">
                     <Filters />
                 </section>

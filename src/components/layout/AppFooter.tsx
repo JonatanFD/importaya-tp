@@ -3,15 +3,15 @@ import ImportaYaLogo from "../icons/ImportaYaLogo";
 
 export default function AppFooter() {
   return (
-    <footer className="border-t pt-10 pb-4">
+    <footer className="border-t pt-10 pb-4 px-4">
       <section className="max-w-7xl mx-auto">
-        <section className="flex justify-between">
+        <section className="flex justify-between flex-col gap-8 md:flex-row">
           <div>
             <ImportaYaLogo className="size-14" />
             <h2 className="text-2xl font-roboto font-bold">ImportaYa</h2>
           </div>
 
-          <nav className="flex gap-8">
+          <nav className="flex gap-8 flex-col md:flex-row">
             <div className="font-mono">
               <h3 className="font-semibold">Home</h3>
 
