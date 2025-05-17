@@ -37,6 +37,27 @@ export async function GetSuppliers() {
     }
 }
 
+export async function GetProducts() {
+    try {
+        const prisma = new PrismaClient();
+        const products = await prisma.products.findMany({
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                url: true,
+                category_id: true,
+                supplier_id: true,
+            },
+        });
+        return products;
+    } catch (error) {
+        console.error("Error getting products:", error);
+        return null;
+    }
+}
+
 // create supplier
 export async function CreateSupplier(data: {
     name: string;
@@ -95,24 +116,35 @@ export async function CreateCategory(data: {
     }
 }       
 
-
-export async function GetProducts() {
+export async function CreateProduct(data: {
+    name: string;
+    description: string;
+    price: number;
+    stock_quantity: number;
+    category_id: string;
+    supplier_id: string;
+    url: string;
+}) {
     try {
         const prisma = new PrismaClient();
-        const products = await prisma.products.findMany({
-            select: {
-                id: true,
-                name: true,
-                description: true,
-                price: true,
-                url: true,
-                category_id: true,
-                supplier_id: true,
-            },
-        });
-        return products;
+
+        console.log("Creating product in database:", data);
+        await prisma.products.create({
+            data: {
+                name: data.name,
+                description: data.description,
+                price: data.price,
+                stock_quantity: data.stock_quantity,
+                category_id: data.category_id,
+                supplier_id: data.supplier_id,
+                url: data.url,
+            }
+        })
+
+        console.log("Product created successfully");
+        return true;
     } catch (error) {
-        console.error("Error getting products:", error);
-        return null;
+        console.error("Error creating product:", error);
+        return false;
     }
 }

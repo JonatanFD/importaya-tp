@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
+import { CreateSupplier } from "@/services/products";
+import { toast } from "sonner";
 
 /*
 model suppliers {
@@ -71,22 +73,8 @@ export default function AddSupplier() {
   const onSubmit = async (data: SupplierFormValues) => {
     setIsSubmitting(true);
     try {
-      // This would be replaced with your actual API call
-      const response = await fetch('/api/suppliers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to add supplier');
-      }
-
-      // Reset form on success
-      form.reset();
-      alert('Supplier added successfully!');
+        await CreateSupplier({...data, notes: data.notes || ""});
+        toast.success("Supplier added successfully");
     } catch (error) {
       console.error('Error adding supplier:', error);
       alert('Failed to add supplier. Please try again.');

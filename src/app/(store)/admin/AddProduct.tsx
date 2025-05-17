@@ -88,6 +88,7 @@ export default function AddProduct() {
 
     const onSubmit = async (data: ProductFormValues) => {
         setIsSubmitting(true);
+
         console.log("Submitting form:", data);
     };
 
