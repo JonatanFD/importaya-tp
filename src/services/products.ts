@@ -1,10 +1,8 @@
 "use server";
 import { PrismaClient } from "@prisma/client";
 
-
 export async function GetCategories() {
-    try
-    {
+    try {
         const prisma = new PrismaClient();
         const categories = await prisma.categories.findMany({
             select: {
@@ -19,10 +17,8 @@ export async function GetCategories() {
     }
 }
 
-
 export async function GetSuppliers() {
-    try
-    {
+    try {
         const prisma = new PrismaClient();
         const suppliers = await prisma.suppliers.findMany({
             select: {
@@ -51,7 +47,10 @@ export async function GetProducts() {
                 supplier_id: true,
             },
         });
-        return products;
+        return products.map((product) => ({
+            ...product,
+            price: Number(product.price),
+        }));
     } catch (error) {
         console.error("Error getting products:", error);
         return null;
@@ -83,8 +82,8 @@ export async function CreateSupplier(data: {
                 payment_terms: data.payment_terms,
                 rating: data.rating,
                 notes: data.notes,
-            }
-        })
+            },
+        });
 
         console.log("Supplier created successfully");
         return true;
@@ -95,9 +94,7 @@ export async function CreateSupplier(data: {
 }
 
 // create category
-export async function CreateCategory(data: {
-    name: string;
-}) {
+export async function CreateCategory(data: { name: string }) {
     try {
         const prisma = new PrismaClient();
 
@@ -105,8 +102,8 @@ export async function CreateCategory(data: {
         await prisma.categories.create({
             data: {
                 name: data.name,
-            }
-        })
+            },
+        });
 
         console.log("Category created successfully");
         return true;
@@ -114,7 +111,7 @@ export async function CreateCategory(data: {
         console.error("Error creating category:", error);
         return false;
     }
-}       
+}
 
 export async function CreateProduct(data: {
     name: string;
@@ -138,8 +135,8 @@ export async function CreateProduct(data: {
                 category_id: data.category_id,
                 supplier_id: data.supplier_id,
                 url: data.url,
-            }
-        })
+            },
+        });
 
         console.log("Product created successfully");
         return true;

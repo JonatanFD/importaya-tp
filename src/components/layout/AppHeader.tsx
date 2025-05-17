@@ -9,11 +9,20 @@ export default async function AppHeader() {
     const session = await supabase.auth.getSession();
 
     const username = session?.data.session?.user.user_metadata.name;
-    
-    const dbUser = await GetUserByEmail(
-        session?.data.session?.user.email as string
-    );
-    const role = dbUser?.role;
+    const email = session?.data.session?.user.email;
+    console.log("SESSION", email);
+
+    let role: string = "";
+
+    if (email) {
+        const dbUser = await GetUserByEmail(email!);
+
+        if (dbUser) {
+            role = dbUser?.role;
+            console.log("EMAIL", dbUser?.email);
+            console.log("ROLE", role);
+        }
+    }
 
     return (
         <header className="px-4 h-16 border-b">

@@ -22,20 +22,33 @@ import { Input } from "../ui/input";
 import {
     Select,
     SelectContent,
+    SelectItem,
     // SelectItem,
     SelectTrigger,
     SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
+import { useEffect, useState } from "react";
+import { GetCategories, GetSuppliers } from "@/services/products";
+import { useHomeProducts } from "@/app/hooks/HomeProducts";
 
 const formSchema = z.object({
     minPrice: z.number().min(0).optional(),
     maxPrice: z.number().min(0).optional(),
-    category: z.string().min(1).optional(),
-    supplierId: z.string().min(1).optional(),
+    category: z.string().optional(),
+    supplierId: z.string().optional(),
 });
 
 export default function Filters() {
+    const {applyFilter} = useHomeProducts()
+
+    const [categories, setCategories] = useState<
+        { id: string; name: string }[]
+    >([]);
+    const [suppliers, setSuppliers] = useState<{ id: string; name: string }[]>(
+        []
+    );
+
     const formState = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             minPrice: 0,
@@ -49,8 +62,20 @@ export default function Filters() {
     const onSubmit = formState.handleSubmit(
         (data: z.infer<typeof formSchema>) => {
             console.log(data);
+
+            applyFilter({
+                minPrice: data.minPrice,
+                maxPrice: data.maxPrice,
+                category: data.category,
+                supplierId: data.supplierId,
+            });
         }
     );
+
+    useEffect(() => {
+        GetCategories().then((res) => setCategories(res ?? []));
+        GetSuppliers().then((res) => setSuppliers(res ?? []));
+    }, []);
 
     return (
         <>
@@ -124,7 +149,20 @@ export default function Filters() {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {/* TODO: Add options */}
+                                                    {categories.map(
+                                                        (category) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    category.id
+                                                                }
+                                                                value={
+                                                                    category.id
+                                                                }
+                                                            >
+                                                                {category.name}
+                                                            </SelectItem>
+                                                        )
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -154,7 +192,20 @@ export default function Filters() {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {/* TODO: Add options */}
+                                                    {suppliers.map(
+                                                        (supplier) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    supplier.id
+                                                                }
+                                                                value={
+                                                                    supplier.id
+                                                                }
+                                                            >
+                                                                {supplier.name}
+                                                            </SelectItem>
+                                                        )
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
