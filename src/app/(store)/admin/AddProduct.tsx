@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
-import { GetCategories, GetSuppliers } from "@/services/products";
+import { CreateProduct, GetCategories, GetSuppliers } from "@/services/products";
+import { toast } from "sonner";
 
 const productFormSchema = z.object({
     name: z.string().min(1, "Product name is required"),
@@ -88,8 +89,16 @@ export default function AddProduct() {
 
     const onSubmit = async (data: ProductFormValues) => {
         setIsSubmitting(true);
+        CreateProduct(data).then((response) => {
+            console.log("Product created:", response);
+            if (!response) {
+                console.error("Error creating product:", response);
+                return;
+            }
+            toast.success("Product created successfully");
 
-        console.log("Submitting form:", data);
+            setIsSubmitting(false);
+        })
     };
 
     return (
